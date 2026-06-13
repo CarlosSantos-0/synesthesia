@@ -3,10 +3,44 @@ import styles from './Stage.module.css';
 import PlaceHolder from '../../assets/PlaceHolder.png';
 import { Menu, Shuffle, SkipBack, Play, Pause, SkipForward, Repeat } from 'lucide-react';
 
-function Stage() {
+function Stage({ token }) {
     const [isPlaying, setIsPlaying] = useState(false);
     const [progress, setProgress] = useState(0);
-    const duration = 180; // Duração simulada de 3 minutos (180 segundos)
+    const [albumCover, setAlbumCover] = useState(PlaceHolder);
+    const duration = 180; 
+
+    useEffect(() => {
+        if (!token) return;
+
+        const fetchCurrentlyPlaying = async () => {
+            try {
+                const response = await fetch("https://api.spotify.com/v1/me/player/currently-playing", {
+                    headers: {
+                        Authorization: `Bearer ${token}`
+                    }
+                });
+
+                if (response.status === 204 || response.status > 400) {
+                    return; 
+                }
+
+                const data = await response.json();
+                
+                if (data && data.item) {
+                    setAlbumCover(data.item.album.images[0].url);
+                    setIsPlaying(data.is_playing);
+                    setProgress(Math.floor(data.progress_ms / 1000));
+                }
+            } catch (error) {
+                console.error("Erro ao buscar música:", error);
+            }
+        };
+
+        fetchCurrentlyPlaying();
+
+        const interval = setInterval(fetchCurrentlyPlaying, 5000);
+        return () => clearInterval(interval);
+    }, [token]);
 
     useEffect(() => {
         let interval;
@@ -20,22 +54,17 @@ function Stage() {
 
     const progressPercent = (progress / duration) * 100;
 
-    const togglePlay = () => setIsPlaying(!isPlaying);
-
     return (
         <div className={styles.stage}>
             
-            {/* TOPO */}
             <header className={styles.header}>
                 <Menu className={styles.menuIcon} size={28} />
             </header>
 
-            {/* CENTRO */}
             <main className={styles.center}>
-                <img src={PlaceHolder} alt="Capa" className={styles.coverImage} />
+                <img src={albumCover} alt="Capa" className={styles.coverImage} />
             </main>
 
-            {/* RODAPÉ */}
             <footer className={styles.footer}>
                 <div className={styles.progressBarContainer}>
                     <div className={styles.progressBar}>
@@ -54,7 +83,7 @@ function Stage() {
                     <Shuffle size={22} className={styles.controlIcon} />
                     <SkipBack size={28} className={styles.controlIcon} />
                     
-                    <div className={styles.playButtonWrapper} onClick={togglePlay}>
+                    <div className={styles.playButtonWrapper}>
                         {isPlaying ? (
                             <Pause size={36} className={styles.playIcon} fill="currentColor" />
                         ) : (
