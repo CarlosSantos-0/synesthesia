@@ -1,0 +1,9 @@
+.canvasContainer {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100vw;
+    height: 100vh;
+    z-index: 6; /* Fica acima de tudo, para ancorar a parte inferior da tela */
+    pointer-events: none;
+}

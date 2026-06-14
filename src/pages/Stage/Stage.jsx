@@ -2,28 +2,35 @@ import { useState, useEffect } from 'react';
 import styles from './Stage.module.css';
 import PlaceHolder from '../../assets/PlaceHolder.png';
 import { Menu } from 'lucide-react';
+
+// Importação dos Componentes das Camadas
 import DynamicBackground from '../../components/DynamicBackground/DynamicBackground';
 import KineticParticles from '../../components/KineticParticles/KineticParticles';
+import OrbitalRhythm from '../../components/OrbitalRhythm/OrbitalRhythm';
+import MelodicEQ from '../../components/MelodicEQ/MelodicEQ';
 import Sidebar from '../SideBar/Sidebar';
 
 function Stage({ token }) {
-    // --- ESTADOS DO MENU E FUNDO ---
+    // --- ESTADOS DO MENU E CAMADAS ---
     const [isMenuOpen, setIsMenuOpen] = useState(false);
-    const [activeBackground, setActiveBackground] = useState('dynamic');
+    const [activeBackground, setActiveBackground] = useState('particles');
+    const [activeRhythm, setActiveRhythm] = useState(8);
+    const [activeMelodic, setActiveMelodic] = useState('eq-bottom');
 
-    // --- ESTADOS DA MÚSICA ---
+    // --- ESTADOS DE CONTROLE DE RÍTMO ---
+    const [bpm, setBpm] = useState(120); 
+    const [energy, setEnergy] = useState(0.5); 
+
+    // --- ESTADOS DE REPRODUÇÃO (SPOTIFY) ---
     const [isPlaying, setIsPlaying] = useState(false);
     const [progress, setProgress] = useState(0);
     const [duration, setDuration] = useState(180);
     const [albumCover, setAlbumCover] = useState(PlaceHolder);
     const [trackName, setTrackName] = useState('');
     const [artistName, setArtistName] = useState('');
-    
     const [trackId, setTrackId] = useState(null);
-    const [bpm, setBpm] = useState(120); 
-    const [energy, setEnergy] = useState(0.5); 
 
-    // 1. Busca a música atual (Polling)
+    // 1. Motor de Polling: Busca metadados da música atual a cada 1 segundo
     useEffect(() => {
         if (!token) return;
 
@@ -59,31 +66,32 @@ function Stage({ token }) {
         return () => clearInterval(interval);
     }, [token, trackId]);
 
-    // 2. Busca as características de áudio (Com a URL corrigida)
+    // 2. Motor de Análise: Captura o BPM e Energia REAIS da música
     useEffect(() => {
         if (!token || !trackId) return;
 
-        const fetchAudioFeatures = async () => {
+        const fetchAudioData = async () => {
             try {
-                // CORREÇÃO AQUI: Adicionado o $ antes da chave para injetar a variável
-                const response = await fetch(`accounts.spotify.com/authorize?...4$${trackId}`, {
+                const resFeatures = await fetch(`https://api.spotify.com/v1/audio-features/$$${trackId}`, {
                     headers: { Authorization: `Bearer ${token}` }
                 });
-                const data = await response.json();
                 
-                if (data) {
-                    setBpm(data.tempo); 
-                    setEnergy(data.energy);  
+                if (resFeatures.ok) {
+                    const dataFeatures = await resFeatures.json();
+                    if (dataFeatures) {
+                        setBpm(dataFeatures.tempo || 120); 
+                        setEnergy(dataFeatures.energy || 0.5);  
+                    }
                 }
             } catch (error) {
-                console.error("Erro ao buscar features de áudio:", error);
+                console.error("Erro ao buscar características de áudio:", error);
             }
         };
 
-        fetchAudioFeatures();
+        fetchAudioData();
     }, [token, trackId]);
 
-    // 3. Atualização local da barra de progresso
+    // 3. Relógio Local: Incrementa a barra de progresso segundo a segundo na UI
     useEffect(() => {
         let interval;
         if (isPlaying) {
@@ -99,32 +107,38 @@ function Stage({ token }) {
     return (
         <div className={styles.stage}>
             
-            {/* INJETANDO A SIDEBAR */}
+            {/* INTERFACE DE CONTROLE COMPLETA */}
             <Sidebar 
                 isOpen={isMenuOpen} 
                 onClose={() => setIsMenuOpen(false)} 
                 activeBg={activeBackground}
                 setActiveBg={setActiveBackground}
+                activeRhythm={activeRhythm}        
+                setActiveRhythm={setActiveRhythm}
+                activeMelodic={activeMelodic}         
+                setActiveMelodic={setActiveMelodic}
             />
 
-            {/* RENDERIZAÇÃO CONDICIONAL DO FUNDO: NÉVOA */}
+            {/* CAMADA 1: BACKGROUNDS */}
             {activeBackground === 'dynamic' && (
-                <DynamicBackground 
-                    albumCoverUrl={albumCover} 
-                    bpm={bpm} 
-                    energy={energy} 
-                />
+                <DynamicBackground albumCoverUrl={albumCover} bpm={bpm} energy={energy} />
             )}
 
-            {/* RENDERIZAÇÃO CONDICIONAL DO FUNDO: PARTÍCULAS (Estava faltando!) */}
             {activeBackground === 'particles' && (
-                <KineticParticles 
-                    albumCoverUrl={albumCover} 
-                    bpm={bpm} 
-                    energy={energy} 
-                />
+                <KineticParticles albumCoverUrl={albumCover} bpm={bpm} energy={energy} />
+            )}
+
+            {/* CAMADA 2: RÍTMICOS */}
+            {activeRhythm > 0 && (
+                <OrbitalRhythm bpm={bpm} steps={activeRhythm} />
+            )}
+
+            {/* CAMADA 3: MELÓDICOS */}
+            {activeMelodic === 'eq-bottom' && (
+                <MelodicEQ bpm={bpm} energy={energy} />
             )}
             
+            {/* CAMADA 4: UI DE TEXTOS E METADADOS */}
             <header className={styles.header}>
                 <Menu 
                     className={styles.menuIcon} 
