@@ -1,0 +1,9 @@
+.canvasBackground {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100vw;
+    height: 100vh;
+    z-index: -1; /* Joga o Canvas para trás de tudo na tela */
+    pointer-events: none; /* Garante que o Canvas não bloqueie os cliques nos botões */
+}

@@ -1,13 +1,24 @@
 import { useState, useEffect } from 'react';
 import styles from './Stage.module.css';
 import PlaceHolder from '../../assets/PlaceHolder.png';
-import { Menu, Shuffle, SkipBack, Play, Pause, SkipForward, Repeat } from 'lucide-react';
+import { Menu } from 'lucide-react';
+import DynamicBackground from '../../components/DynamicBackground/DynamicBackground';
+import Sidebar from '../SideBar/Sidebar'
 
 function Stage({ token }) {
+    const [isMenuOpen, setIsMenuOpen] = useState(false);
+    const [activeBackground, setActiveBackground] = useState('dynamic');
+
     const [isPlaying, setIsPlaying] = useState(false);
     const [progress, setProgress] = useState(0);
+    const [duration, setDuration] = useState(180);
     const [albumCover, setAlbumCover] = useState(PlaceHolder);
-    const duration = 180; 
+    const [trackName, setTrackName] = useState('');
+    const [artistName, setArtistName] = useState('');
+    
+    const [trackId, setTrackId] = useState(null);
+    const [bpm, setBpm] = useState(120); 
+    const [energy, setEnergy] = useState(0.5); 
 
     useEffect(() => {
         if (!token) return;
@@ -15,14 +26,10 @@ function Stage({ token }) {
         const fetchCurrentlyPlaying = async () => {
             try {
                 const response = await fetch("https://api.spotify.com/v1/me/player/currently-playing", {
-                    headers: {
-                        Authorization: `Bearer ${token}`
-                    }
+                    headers: { Authorization: `Bearer ${token}` }
                 });
 
-                if (response.status === 204 || response.status > 400) {
-                    return; 
-                }
+                if (response.status === 204 || response.status > 400) return; 
 
                 const data = await response.json();
                 
@@ -30,6 +37,13 @@ function Stage({ token }) {
                     setAlbumCover(data.item.album.images[0].url);
                     setIsPlaying(data.is_playing);
                     setProgress(Math.floor(data.progress_ms / 1000));
+                    setDuration(Math.floor(data.item.duration_ms / 1000));
+                    setTrackName(data.item.name);
+                    setArtistName(data.item.artists.map(artist => artist.name).join(', '));
+                    
+                    if (data.item.id !== trackId) {
+                        setTrackId(data.item.id);
+                    }
                 }
             } catch (error) {
                 console.error("Erro ao buscar música:", error);
@@ -37,11 +51,34 @@ function Stage({ token }) {
         };
 
         fetchCurrentlyPlaying();
-
-        const interval = setInterval(fetchCurrentlyPlaying, 5000);
+        const interval = setInterval(fetchCurrentlyPlaying, 1000); 
         return () => clearInterval(interval);
-    }, [token]);
+    }, [token, trackId]);
 
+    // 2. Busca as características de áudio (Roda SÓ quando o trackId muda)
+    useEffect(() => {
+        if (!token || !trackId) return;
+
+        const fetchAudioFeatures = async () => {
+            try {
+                const response = await fetch(`accounts.spotify.com/authorize?...4${trackId}`, {
+                    headers: { Authorization: `Bearer ${token}` }
+                });
+                const data = await response.json();
+                
+                if (data) {
+                    setBpm(data.tempo); 
+                    setEnergy(data.energy);  
+                }
+            } catch (error) {
+                console.error("Erro ao buscar features de áudio:", error);
+            }
+        };
+
+        fetchAudioFeatures();
+    }, [token, trackId]);
+
+    // 3. Atualização local da barra de progresso
     useEffect(() => {
         let interval;
         if (isPlaying) {
@@ -50,15 +87,41 @@ function Stage({ token }) {
             }, 1000);
         }
         return () => clearInterval(interval);
-    }, [isPlaying]);
+    }, [isPlaying, duration]);
 
     const progressPercent = (progress / duration) * 100;
 
     return (
         <div className={styles.stage}>
             
+            {/* INJETANDO A SIDEBAR */}
+            <Sidebar 
+                isOpen={isMenuOpen} 
+                onClose={() => setIsMenuOpen(false)} 
+                activeBg={activeBackground}
+                setActiveBg={setActiveBackground}
+            />
+
+            {/* RENDERIZAÇÃO CONDICIONAL DO FUNDO */}
+            {activeBackground === 'dynamic' && (
+                <DynamicBackground 
+                    albumCoverUrl={albumCover} 
+                    bpm={bpm} 
+                    energy={energy} 
+                />
+            )}
+            
             <header className={styles.header}>
-                <Menu className={styles.menuIcon} size={28} />
+                {/* ADICIONADO O ONCLICK NO ÍCONE DO MENU */}
+                <Menu 
+                    className={styles.menuIcon} 
+                    size={28} 
+                    onClick={() => setIsMenuOpen(true)} 
+                />
+                <div className={styles.trackInfo}>
+                    <h1 className={styles.trackName}>{trackName || "Sem reprodução"}</h1>
+                    <p className={styles.artistName}>{artistName || "Nenhum artista"}</p>
+                </div>
             </header>
 
             <main className={styles.center}>
@@ -77,22 +140,6 @@ function Stage({ token }) {
                             style={{ left: `${progressPercent}%` }}
                         ></div>
                     </div>
-                </div>
-
-                <div className={styles.controls}>
-                    <Shuffle size={22} className={styles.controlIcon} />
-                    <SkipBack size={28} className={styles.controlIcon} />
-                    
-                    <div className={styles.playButtonWrapper}>
-                        {isPlaying ? (
-                            <Pause size={36} className={styles.playIcon} fill="currentColor" />
-                        ) : (
-                            <Play size={36} className={styles.playIcon} fill="currentColor" />
-                        )}
-                    </div>
-                    
-                    <SkipForward size={28} className={styles.controlIcon} />
-                    <Repeat size={22} className={styles.controlIcon} />
                 </div>
             </footer>
             

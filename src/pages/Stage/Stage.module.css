@@ -4,7 +4,12 @@
     justify-content: space-between;
     width: 100vw;
     height: 100vh;
-    background-color: #08060d;
+    background-color: transparent; /* Você já fez isso, perfeito! */
+    
+    /* ADICIONE ESTAS DUAS LINHAS: */
+    position: relative; 
+    z-index: 1; 
+    
     color: white;
     box-sizing: border-box;
 }
@@ -13,7 +18,40 @@
 .header {
     padding: 32px 48px;
     display: flex;
-    justify-content: flex-start;
+    justify-content: space-between;
+    align-items: flex-start;
+}
+
+.menuIcon {
+    color: white;
+    cursor: pointer;
+    opacity: 0.6;
+    transition: opacity 0.2s ease, transform 0.2s ease;
+}
+
+.menuIcon:hover {
+    opacity: 1;
+    transform: scale(1.1);
+}
+
+.trackInfo {
+    display: flex;
+    flex-direction: column;
+    text-align: right;
+}
+
+.trackName {
+    font-size: 20px;
+    font-weight: 500;
+    margin: 0;
+    color: white;
+    letter-spacing: -0.5px;
+}
+
+.artistName {
+    font-size: 14px;
+    margin: 4px 0 0 0;
+    color: rgba(255, 255, 255, 0.5);
 }
 
 /* --- CENTRO --- */
@@ -38,7 +76,7 @@
     display: flex;
     flex-direction: column;
     align-items: center;
-    gap: 32px;
+    justify-content: flex-end;
 }
 
 .progressBarContainer {
@@ -60,7 +98,7 @@
     height: 100%;
     background-color: white;
     border-radius: 2px;
-    transition: width 1s linear; 
+    transition: width 1s linear;
 }
 
 .progressIndicator {
@@ -71,37 +109,5 @@
     height: 12px;
     background-color: white;
     border-radius: 50%;
-    transition: left 1s linear; 
-}
-
-.controls {
-    display: flex;
-    gap: 40px;
-    align-items: center;
-}
-
-.playButtonWrapper {
-    display: flex;
-    align-items: center;
-    justify-content: center;
-}
-
-.menuIcon,
-.controlIcon,
-.playIcon {
-    color: white;
-    cursor: pointer;
-    opacity: 0.6;
-    transition: opacity 0.2s ease, transform 0.2s ease;
-}
-
-.menuIcon:hover,
-.controlIcon:hover,
-.playIcon:hover {
-    opacity: 1;
-    transform: scale(1.1);
-}
-
-.playIcon {
-    opacity: 0.9;
+    transition: left 1s linear;
 }

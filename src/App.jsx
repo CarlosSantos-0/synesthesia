@@ -1,23 +1,35 @@
-import { useEffect, useState } from 'react';
+import { useEffect, useState, useRef } from 'react';
 import Stage from './pages/Stage/Stage';
 import { redirectToAuthCodeFlow, getAccessToken } from './spotify';
 
 function App() {
   const [token, setToken] = useState(null);
+  
+  // Criamos o nosso cadeado (começa destrancado)
+  const hasFetchedToken = useRef(false);
 
   useEffect(() => {
     const params = new URLSearchParams(window.location.search);
     const code = params.get("code");
 
-    if (!code) {
+    // Se não tem código, ou se o cadeado já foi trancado, aborta.
+    if (!code || hasFetchedToken.current) {
         return; 
     }
 
+    // Tranca o cadeado para a segunda execução do StrictMode bater na porta e voltar
+    hasFetchedToken.current = true;
+
     const fetchToken = async () => {
-        const tokenFromApi = await getAccessToken(code);
-        if (tokenFromApi) {
-            setToken(tokenFromApi);
-            window.history.pushState({}, null, '/'); 
+        try {
+            const tokenFromApi = await getAccessToken(code);
+            if (tokenFromApi) {
+                setToken(tokenFromApi);
+                // Limpa a URL
+                window.history.pushState({}, null, '/'); 
+            }
+        } catch (error) {
+            console.error("Erro ao resgatar o token:", error);
         }
     };
 
