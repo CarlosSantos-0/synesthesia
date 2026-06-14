@@ -3,12 +3,15 @@ import styles from './Stage.module.css';
 import PlaceHolder from '../../assets/PlaceHolder.png';
 import { Menu } from 'lucide-react';
 import DynamicBackground from '../../components/DynamicBackground/DynamicBackground';
-import Sidebar from '../SideBar/Sidebar'
+import KineticParticles from '../../components/KineticParticles/KineticParticles';
+import Sidebar from '../SideBar/Sidebar';
 
 function Stage({ token }) {
+    // --- ESTADOS DO MENU E FUNDO ---
     const [isMenuOpen, setIsMenuOpen] = useState(false);
     const [activeBackground, setActiveBackground] = useState('dynamic');
 
+    // --- ESTADOS DA MÚSICA ---
     const [isPlaying, setIsPlaying] = useState(false);
     const [progress, setProgress] = useState(0);
     const [duration, setDuration] = useState(180);
@@ -20,6 +23,7 @@ function Stage({ token }) {
     const [bpm, setBpm] = useState(120); 
     const [energy, setEnergy] = useState(0.5); 
 
+    // 1. Busca a música atual (Polling)
     useEffect(() => {
         if (!token) return;
 
@@ -55,13 +59,14 @@ function Stage({ token }) {
         return () => clearInterval(interval);
     }, [token, trackId]);
 
-    // 2. Busca as características de áudio (Roda SÓ quando o trackId muda)
+    // 2. Busca as características de áudio (Com a URL corrigida)
     useEffect(() => {
         if (!token || !trackId) return;
 
         const fetchAudioFeatures = async () => {
             try {
-                const response = await fetch(`accounts.spotify.com/authorize?...4${trackId}`, {
+                // CORREÇÃO AQUI: Adicionado o $ antes da chave para injetar a variável
+                const response = await fetch(`accounts.spotify.com/authorize?...4$${trackId}`, {
                     headers: { Authorization: `Bearer ${token}` }
                 });
                 const data = await response.json();
@@ -102,7 +107,7 @@ function Stage({ token }) {
                 setActiveBg={setActiveBackground}
             />
 
-            {/* RENDERIZAÇÃO CONDICIONAL DO FUNDO */}
+            {/* RENDERIZAÇÃO CONDICIONAL DO FUNDO: NÉVOA */}
             {activeBackground === 'dynamic' && (
                 <DynamicBackground 
                     albumCoverUrl={albumCover} 
@@ -110,9 +115,17 @@ function Stage({ token }) {
                     energy={energy} 
                 />
             )}
+
+            {/* RENDERIZAÇÃO CONDICIONAL DO FUNDO: PARTÍCULAS (Estava faltando!) */}
+            {activeBackground === 'particles' && (
+                <KineticParticles 
+                    albumCoverUrl={albumCover} 
+                    bpm={bpm} 
+                    energy={energy} 
+                />
+            )}
             
             <header className={styles.header}>
-                {/* ADICIONADO O ONCLICK NO ÍCONE DO MENU */}
                 <Menu 
                     className={styles.menuIcon} 
                     size={28} 

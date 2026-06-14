@@ -42,6 +42,13 @@ export default function Sidebar({ isOpen, onClose, activeBg, setActiveBg }) {
                                 >
                                     Gradiente
                                 </button>
+
+                                <button 
+                                    className={`${styles.optionBtn} ${activeBg === 'particles' ? styles.active : ''}`}
+                                    onClick={() => setActiveBg('particles')}
+                                >
+                                    Partículas Cinéticas
+                                </button>
                                 
                                 <button 
                                     className={`${styles.optionBtn} ${activeBg === 'none' ? styles.active : ''}`}
