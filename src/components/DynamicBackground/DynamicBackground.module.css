@@ -4,6 +4,6 @@
     left: 0;
     width: 100vw;
     height: 100vh;
-    z-index: -1; /* Joga o Canvas para trás de tudo na tela */
-    pointer-events: none; /* Garante que o Canvas não bloqueie os cliques nos botões */
+    z-index: -1; 
+    pointer-events: none; 
 }

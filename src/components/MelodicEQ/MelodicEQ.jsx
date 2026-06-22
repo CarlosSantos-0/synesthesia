@@ -6,17 +6,21 @@ export default function MelodicEQ({ bpm = 120, energy = 0.5, albumCoverUrl }) {
     const canvasRef = useRef(null);
     const colorRef = useRef('rgba(255, 255, 255, 0.5)');
 
-    // Extração de cor da capa
+    // Extrai a cor predominante da capa do álbum para o preenchimento dinâmico
     useEffect(() => {
         if (!albumCoverUrl) return;
-        extractColors(albumCoverUrl).then((colors) => {
-            if (colors && colors.length > 0) {
-                const p = colors[0];
-                colorRef.current = `rgba(${p.red}, ${p.green}, ${p.blue}, 0.8)`;
-            }
-        });
+        
+        extractColors(albumCoverUrl)
+            .then((colors) => {
+                if (colors && colors.length > 0) {
+                    const primaryColor = colors[0];
+                    colorRef.current = `rgba(${primaryColor.red}, ${primaryColor.green}, ${primaryColor.blue}, 0.8)`;
+                }
+            })
+            .catch((err) => console.error("Erro na extração de cor do equalizador:", err));
     }, [albumCoverUrl]);
 
+    // Motor de renderização procedural do Canvas
     useEffect(() => {
         const canvas = canvasRef.current;
         const ctx = canvas.getContext('2d');
@@ -30,10 +34,11 @@ export default function MelodicEQ({ bpm = 120, energy = 0.5, albumCoverUrl }) {
         resizeCanvas();
 
         const barsPerSide = 64;
-        let currentHeights = new Array(barsPerSide).fill(0);
+        const currentHeights = new Array(barsPerSide).fill(0);
 
         const render = () => {
             ctx.clearRect(0, 0, canvas.width, canvas.height);
+            
             const cx = canvas.width / 2;
             const baseY = canvas.height;
             const time = performance.now() / 1000;
@@ -47,23 +52,21 @@ export default function MelodicEQ({ bpm = 120, energy = 0.5, albumCoverUrl }) {
             for (let i = 0; i < barsPerSide; i++) {
                 const ratio = i / (barsPerSide - 1);
 
-                // --- MATEMÁTICA DE FORMA (VALE + MONTANHA) ---
+                // Cálculo da curva base (Vales no centro, montanhas nas extremidades)
                 const baseShape = Math.pow(ratio, 3) * 150;
 
-                // --- ONDULAÇÕES ORGÂNICAS (Mais rápidas) ---
-                // Diminuí a divisão do tempo para o movimento ficar mais "agitado"
+                // Modulação orgânica de frequência e sobreposição de ondas
                 const wave = Math.sin(time * 1.5 + i * 0.1) * 20 + Math.sin(time * 2.5 - i * 0.05) * 8;
 
-                // --- INTENSIDADE AUMENTADA ---
-                // Agora o energy tem mais peso na resposta das barras
+                // Aplicação da energia musical sobre a amplitude alvo
                 const targetHeight = (15 + baseShape + (wave * (energy * 1.5))) * (0.6 + energy * 0.8);
 
-                // --- LERP MAIS ÁGIL (De 0.08 para 0.25) ---
-                // Isso elimina a sensação de "lento demais"
+                // Suavização linear (Lerp) para fluidez de movimento do bloco
                 currentHeights[i] += (targetHeight - currentHeights[i]) * 0.25;
 
-                // Desenha as barras
                 const drawHeight = -currentHeights[i];
+                
+                // Renderização espelhada a partir do centro (Direita e Esquerda)
                 ctx.fillRect(cx + (i * step), baseY, barWidth, drawHeight);
                 ctx.fillRect(cx - (i * step) - step + gap, baseY, barWidth, drawHeight);
             }
@@ -72,6 +75,7 @@ export default function MelodicEQ({ bpm = 120, energy = 0.5, albumCoverUrl }) {
         };
 
         render();
+        
         return () => {
             window.removeEventListener('resize', resizeCanvas);
             cancelAnimationFrame(animationFrameId);

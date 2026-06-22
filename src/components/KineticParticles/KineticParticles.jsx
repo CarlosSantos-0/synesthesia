@@ -13,7 +13,6 @@ export default function KineticParticles({ albumCoverUrl, bpm = 120, energy = 0.
             { r: 255, g: 255, b: 255 }
         ]; 
         
-        // Retornamos as variáveis de fundo escuro padrão
         let bgR = 8, bgG = 6, bgB = 13;
 
         const resizeCanvas = () => {
@@ -49,7 +48,6 @@ export default function KineticParticles({ albumCoverUrl, bpm = 120, energy = 0.
                     
                     colorPalette = [c1, c2, c3, c4];
                     
-                    // Restauramos a matemática do fundo com 15% de brilho
                     bgR = Math.floor(((c1.r + c2.r + c3.r + c4.r) / 4) * 0.15);
                     bgG = Math.floor(((c1.g + c2.g + c3.g + c4.g) / 4) * 0.15);
                     bgB = Math.floor(((c1.b + c2.b + c3.b + c4.b) / 4) * 0.15);
@@ -73,10 +71,8 @@ export default function KineticParticles({ albumCoverUrl, bpm = 120, energy = 0.
                 this.x = Math.random() * canvas.width;
                 this.y = Math.random() * canvas.height;
                 
-                // Mantemos o tamanho um pouco mais visível
                 this.size = Math.random() * 2 + 1; 
                 
-                // Mantemos a opacidade base mais alta para brilho
                 this.alpha = Math.random() * 0.5 + 0.5; 
                 
                 this.baseVx = (Math.random() - 0.5) * 0.5;
@@ -119,11 +115,9 @@ export default function KineticParticles({ albumCoverUrl, bpm = 120, energy = 0.
         const render = () => {
             ctx.globalCompositeOperation = 'source-over';
             
-            // O fundo volta a usar a cor calculada dinamicamente com opacidade de 0.2 para o rastro
             ctx.fillStyle = `rgba(${bgR}, ${bgG}, ${bgB}, 0.2)`; 
             ctx.fillRect(0, 0, canvas.width, canvas.height);
 
-            // Mantemos o modo 'lighter' para as partículas se somarem onde colidem
             ctx.globalCompositeOperation = 'lighter';
 
             const beatsPerSecond = bpm / 60;

@@ -5,7 +5,6 @@ import { redirectToAuthCodeFlow, getAccessToken } from './spotify';
 function App() {
   const [token, setToken] = useState(null);
   
-  // Criamos o nosso cadeado (começa destrancado)
   const hasFetchedToken = useRef(false);
 
   useEffect(() => {
