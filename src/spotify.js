@@ -1,6 +1,5 @@
-// src/spotify.js
 
-export const clientId = "f461f8cfa4c546aba61bd7fc89b68d4f"; 
+const CLIENT_ID = import.meta.env.VITE_SPOTIFY_CLIENT_ID; 
 const redirectUri = "http://127.0.0.1:5173/"; 
 
 const scopes = [
@@ -8,7 +7,6 @@ const scopes = [
   "user-read-playback-state",
 ];
 
-// 1. Redireciona o usuário pedindo o "code"
 export async function redirectToAuthCodeFlow() {
     const verifier = generateCodeVerifier(128);
     const challenge = await generateCodeChallenge(verifier);
@@ -26,7 +24,6 @@ export async function redirectToAuthCodeFlow() {
     document.location = `https://accounts.spotify.com/authorize?${params.toString()}`;
 }
 
-// 2. Troca o "code" pelo Token de Acesso de verdade
 export async function getAccessToken(code) {
     const verifier = localStorage.getItem("verifier");
 
@@ -47,7 +44,6 @@ export async function getAccessToken(code) {
     return data.access_token;
 }
 
-// --- Funções Criptográficas Auxiliares de Segurança ---
 function generateCodeVerifier(length) {
     let text = '';
     let possible = 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789';
