@@ -65,7 +65,7 @@ npm run dev
 * **Lucide React:** Biblioteca de ícones da interface SVG.
 * **extract-colors:** Biblioteca auxiliar para mapeamento de paleta de cores via buffer de imagem offscreen.
 
-* ## ⚠️ Aviso sobre a Versão Online (Deploy na Vercel)
+ ## ⚠️ Aviso sobre a Versão Online (Deploy na Vercel)
 
 A aplicação encontra-se hospedada e operacional através da Vercel. No entanto, por se tratar de um projeto acadêmico, a integração com a API do Spotify encontra-se em **Development Mode** (Modo de Desenvolvimento). 
 
