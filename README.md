@@ -64,3 +64,13 @@ npm run dev
 * **Spotify Web API:** Aquisição de metadados (`trackName`, `albumCoverUrl`) e características de áudio numéricas (`bpm`, `energy`).
 * **Lucide React:** Biblioteca de ícones da interface SVG.
 * **extract-colors:** Biblioteca auxiliar para mapeamento de paleta de cores via buffer de imagem offscreen.
+
+* ## ⚠️ Aviso sobre a Versão Online (Deploy na Vercel)
+
+A aplicação encontra-se hospedada e operacional através da Vercel. No entanto, por se tratar de um projeto acadêmico, a integração com a API do Spotify encontra-se em **Development Mode** (Modo de Desenvolvimento). 
+
+Neste modo, as políticas de segurança do Spotify bloqueiam o acesso público e restringem o login **apenas para usuários cujos e-mails foram manualmente adicionados à *whitelist*** do painel de controle do desenvolvedor. Se um usuário não cadastrado tentar logar, a API retornará um erro de permissão.
+
+**Para fins de avaliação técnica:**
+1. **Vídeo de Demonstração:** Um vídeo detalhado acompanha esta entrega, demonstrando o fluxo OAuth 2.0 PKCE, a estabilidade de renderização do Canvas e a reatividade procedural do equalizador funcionando perfeitamente em ambiente local.
+2. **Teste Prático (Opcional):** Caso a banca avaliadora deseje testar a interface diretamente na Vercel, basta entrar em contato informando o e-mail associado à conta do Spotify para que o acesso seja imediatamente liberado no painel da API.
