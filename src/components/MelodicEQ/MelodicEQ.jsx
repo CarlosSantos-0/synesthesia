@@ -6,7 +6,6 @@ export default function MelodicEQ({ bpm = 120, energy = 0.5, albumCoverUrl }) {
     const canvasRef = useRef(null);
     const colorRef = useRef('rgba(255, 255, 255, 0.5)');
 
-    // Extrai a cor predominante da capa do álbum para o preenchimento dinâmico
     useEffect(() => {
         if (!albumCoverUrl) return;
         
@@ -20,7 +19,6 @@ export default function MelodicEQ({ bpm = 120, energy = 0.5, albumCoverUrl }) {
             .catch((err) => console.error("Erro na extração de cor do equalizador:", err));
     }, [albumCoverUrl]);
 
-    // Motor de renderização procedural do Canvas
     useEffect(() => {
         const canvas = canvasRef.current;
         const ctx = canvas.getContext('2d');
