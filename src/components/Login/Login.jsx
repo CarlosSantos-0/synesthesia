@@ -1,7 +1,7 @@
 import styles from './Login.module.css';
 
 const CLIENT_ID = import.meta.env.VITE_SPOTIFY_CLIENT_ID; 
-const REDIRECT_URI = "http://127.0.0.1:5173/"; 
+const REDIRECT_URI = window.location.origin + "/";
 
 const generateRandomString = (length) => {
     const possible = 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789';
