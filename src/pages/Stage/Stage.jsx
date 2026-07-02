@@ -8,6 +8,8 @@ import KineticParticles from '../../components/KineticParticles/KineticParticles
 import OrbitalRhythm from '../../components/OrbitalRhythm/OrbitalRhythm';
 import MelodicEQ from '../../components/MelodicEQ/MelodicEQ';
 import Sidebar from '../SideBar/Sidebar';
+import GlitchRhythm from '../../components/GlitchRhythm/GlitchRhythm';
+import BrutalistBackground from '../../components/BrutalistBackground/BrutalistBackground';
 
 function Stage({ token }) {
     const [isMenuOpen, setIsMenuOpen] = useState(false);
@@ -15,6 +17,7 @@ function Stage({ token }) {
     const [activeRhythm, setActiveRhythm] = useState(8);
     const [activeMelodic, setActiveMelodic] = useState('eq-bottom');
 
+    // Estados estáticos mantidos para não quebrar a mesa de VJ
     const [bpm, setBpm] = useState(120); 
     const [energy, setEnergy] = useState(0.5); 
 
@@ -35,11 +38,26 @@ function Stage({ token }) {
                     headers: { Authorization: `Bearer ${token}` }
                 });
 
-                if (response.status === 204 || response.status > 400) return; 
+                if (response.status === 204) {
+                    console.log('Spotify currently-playing returned 204 (no content)');
+                    return;
+                }
+                if (!response.ok) {
+                    const errorText = await response.text();
+                    console.error('Spotify currently-playing error', response.status, errorText);
+                    return;
+                }
 
                 const data = await response.json();
+                console.log('Spotify currently-playing data', data);
                 
                 if (data && data.item) {
+                    console.log('Spotify item', {
+                        id: data.item.id,
+                        type: data.item.type,
+                        name: data.item.name,
+                        is_playing: data.is_playing,
+                    });
                     setAlbumCover(data.item.album.images[0].url);
                     setIsPlaying(data.is_playing);
                     setProgress(Math.floor(data.progress_ms / 1000));
@@ -47,8 +65,12 @@ function Stage({ token }) {
                     setTrackName(data.item.name);
                     setArtistName(data.item.artists.map(artist => artist.name).join(', '));
                     
-                    if (data.item.id !== trackId) {
-                        setTrackId(data.item.id);
+                    if (data.item.type === 'track') {
+                        if (data.item.id !== trackId) {
+                            setTrackId(data.item.id);
+                        }
+                    } else {
+                        setTrackId(null);
                     }
                 }
             } catch (error) {
@@ -62,28 +84,18 @@ function Stage({ token }) {
     }, [token, trackId]);
 
     useEffect(() => {
-        if (!token || !trackId) return;
+        console.log('Stage state', {
+            activeBackground,
+            isPlaying,
+            trackId,
+            trackName,
+            artistName,
+            bpm,
+            energy,
+        });
+    }, [activeBackground, isPlaying, trackId, trackName, artistName, bpm, energy]);
 
-        const fetchAudioData = async () => {
-            try {
-                const resFeatures = await fetch(`https://api.spotify.com/v1/audio-features/$$$${trackId}`, {
-                    headers: { Authorization: `Bearer ${token}` }
-                });
-                
-                if (resFeatures.ok) {
-                    const dataFeatures = await resFeatures.json();
-                    if (dataFeatures) {
-                        setBpm(dataFeatures.tempo || 120); 
-                        setEnergy(dataFeatures.energy || 0.5);  
-                    }
-                }
-            } catch (error) {
-                console.error("Erro ao buscar características de áudio:", error);
-            }
-        };
-
-        fetchAudioData();
-    }, [token, trackId]);
+    // O useEffect do fetchAudioData foi completamente removido daqui.
 
     useEffect(() => {
         let interval;
@@ -120,8 +132,16 @@ function Stage({ token }) {
                 <KineticParticles albumCoverUrl={albumCover} bpm={bpm} energy={energy} />
             )}
 
+            {activeBackground === 'brutalist' && (
+                <BrutalistBackground bpm={bpm} isPlaying={isPlaying} />
+            )}
+
             {activeRhythm > 0 && (
                 <OrbitalRhythm bpm={bpm} steps={activeRhythm} />
+            )}
+
+            {activeRhythm === 'glitch' && (
+                <GlitchRhythm bpm={bpm} energy={energy} isPlaying={isPlaying} />
             )}
 
             {activeMelodic === 'eq-bottom' && (

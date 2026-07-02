@@ -40,13 +40,16 @@ export default function Sidebar({
 
                         {isBgMenuExpanded && (
                             <div className={styles.groupOptions}>
-                                <button className={`${styles.optionBtn} ${activeBg === 'dynamic' ? styles.active : ''}`} onClick={() => setActiveBg('dynamic')}>
+                                <button className={`${styles.optionBtn} ${activeBg === 'dynamic' ? styles.active : ''}`} onClick={() => { console.log('Sidebar selected background', 'dynamic'); setActiveBg('dynamic'); }}>
                                     Névoa Reativa
                                 </button>
-                                <button className={`${styles.optionBtn} ${activeBg === 'particles' ? styles.active : ''}`} onClick={() => setActiveBg('particles')}>
+                                <button className={`${styles.optionBtn} ${activeBg === 'particles' ? styles.active : ''}`} onClick={() => { console.log('Sidebar selected background', 'particles'); setActiveBg('particles'); }}>
                                     Partículas Cinéticas
                                 </button>
-                                <button className={`${styles.optionBtn} ${activeBg === 'none' ? styles.active : ''}`} onClick={() => setActiveBg('none')}>
+                                <button className={`${styles.optionBtn} ${activeBg === 'brutalist' ? styles.active : ''}`} onClick={() => { console.log('Sidebar selected background', 'brutalist'); setActiveBg('brutalist'); }}>
+                                    Brutalista
+                                </button>
+                                <button className={`${styles.optionBtn} ${activeBg === 'none' ? styles.active : ''}`} onClick={() => { console.log('Sidebar selected background', 'none'); setActiveBg('none'); }}>
                                     Fundo Escuro
                                 </button>
                             </div>
@@ -73,6 +76,9 @@ export default function Sidebar({
                                 </button>
                                 <button className={`${styles.optionBtn} ${activeRhythm === 16 ? styles.active : ''}`} onClick={() => setActiveRhythm(16)}>
                                     Anel Orbital (16 Beats)
+                                </button>
+                                <button className={`${styles.optionBtn} ${activeRhythm === 'glitch' ? styles.active : ''}`} onClick={() => setActiveRhythm('glitch')}>
+                                    Take Time (8 Beats)
                                 </button>
                                 <button className={`${styles.optionBtn} ${activeRhythm === 0 ? styles.active : ''}`} onClick={() => setActiveRhythm(0)}>
                                     Desligado
