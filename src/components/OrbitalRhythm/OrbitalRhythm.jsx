@@ -1,7 +1,8 @@
 import { useRef, useEffect } from 'react';
 import styles from './OrbitalRhythm.module.css';
 
-export default function OrbitalRhythm({ bpm = 120, steps = 8 }) {
+// Adicionei a prop isPlaying para travar o relógio quando a música parar
+export default function OrbitalRhythm({ bpm = 120, steps = 8, isPlaying = true }) {
     const canvasRef = useRef(null);
 
     useEffect(() => {
@@ -16,20 +17,49 @@ export default function OrbitalRhythm({ bpm = 120, steps = 8 }) {
         window.addEventListener('resize', resizeCanvas);
         resizeCanvas();
 
-        const render = () => {
+        // MOTOR RÍTMICO SINCRONIZADO (Substituindo o performance.now absoluto)
+        let lastTime = performance.now();
+        let beatAccumulator = 0;
+        let currentStep = 0;
+
+        const safeBpm = bpm > 0 ? bpm : 120;
+        const msPerBeat = 60000 / safeBpm;
+
+        const render = (time) => {
+            let deltaTime = time - lastTime;
+            if (deltaTime > 100) deltaTime = 16;
+            lastTime = time;
+
+            if (isPlaying) {
+                beatAccumulator += deltaTime;
+
+                if (beatAccumulator >= msPerBeat) {
+                    beatAccumulator -= msPerBeat;
+                    currentStep = (currentStep + 1) % steps;
+                }
+            }
+
             ctx.clearRect(0, 0, canvas.width, canvas.height);
 
             const cx = canvas.width / 2;
             const cy = (canvas.height / 2) + 30;
 
-            const beatsPerSecond = bpm / 60;
-            const currentTime = performance.now() / 1000;
-            const currentBeatContinuous = currentTime * beatsPerSecond;
-            
-            const currentStep = Math.floor(currentBeatContinuous) % steps;
-            const beatDecay = 1 - (currentBeatContinuous % 1);
+            // Recriamos o valor contínuo para os anéis girarem suavemente, 
+            // mas agora atrelado ao motor interno em vez do tempo do navegador
+            const progress = isPlaying ? (beatAccumulator / msPerBeat) : 0;
+            const currentBeatContinuous = currentStep + progress;
+            const beatDecay = 1 - progress;
 
-            const pulseAmount = 1 + (beatDecay * 0.04);
+            // LÓGICA DO RITMO KICK/SNARE
+            // Passos pares (0, 2, 4, 6) = Kick / Passos ímpares (1, 3, 5, 7) = Snare
+            const isKick = currentStep % 2 === 0;
+
+            // EFEITO VISUAL DE RESPIRAÇÃO:
+            // No Kick o anel expande (+), no Snare ele contrai (-)
+            const pulseAmount = isKick 
+                ? 1 + (beatDecay * 0.06) 
+                : 1 - (beatDecay * 0.04);
+
             const currentInnerRadius = 180 * pulseAmount; 
             const currentOuterRadius = 240 * pulseAmount;
 
@@ -66,8 +96,12 @@ export default function OrbitalRhythm({ bpm = 120, steps = 8 }) {
                 ctx.rotate(angle);     
                 
                 if (i === currentStep) {
-                    ctx.fillStyle = `rgba(255, 255, 255, ${0.4 + (beatDecay * 0.6)})`; 
-                    ctx.shadowBlur = 15 * beatDecay;
+                    // O marcador brilha mais forte no kick e mais suave no snare
+                    const alpha = isKick ? 0.4 + (beatDecay * 0.6) : 0.2 + (beatDecay * 0.3);
+                    ctx.fillStyle = `rgba(255, 255, 255, ${alpha})`; 
+                    
+                    // Somente o Kick recebe aura (shadowBlur)
+                    ctx.shadowBlur = isKick ? 20 * beatDecay : 0;
                     ctx.shadowColor = 'white';
                 } else {
                     ctx.fillStyle = 'rgba(255, 255, 255, 0.1)';
@@ -81,13 +115,13 @@ export default function OrbitalRhythm({ bpm = 120, steps = 8 }) {
             animationFrameId = requestAnimationFrame(render);
         };
 
-        render();
+        animationFrameId = requestAnimationFrame(render);
 
         return () => {
             window.removeEventListener('resize', resizeCanvas);
             cancelAnimationFrame(animationFrameId);
         };
-    }, [bpm, steps]);
+    }, [bpm, steps, isPlaying]);
 
     return <canvas ref={canvasRef} className={styles.canvasContainer} />;
 }

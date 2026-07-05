@@ -49,6 +49,9 @@ export default function Sidebar({
                                 <button className={`${styles.optionBtn} ${activeBg === 'brutalist' ? styles.active : ''}`} onClick={() => { console.log('Sidebar selected background', 'brutalist'); setActiveBg('brutalist'); }}>
                                     Brutalista
                                 </button>
+                                <button className={`${styles.optionBtn} ${activeBg === 'elastic' ? styles.active : ''}`} onClick={() => { console.log('Sidebar selected background', 'elastic'); setActiveBg('elastic'); }}>
+                                    Slam jam
+                                </button>
                                 <button className={`${styles.optionBtn} ${activeBg === 'none' ? styles.active : ''}`} onClick={() => { console.log('Sidebar selected background', 'none'); setActiveBg('none'); }}>
                                     Fundo Escuro
                                 </button>

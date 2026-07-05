@@ -10,6 +10,7 @@ import MelodicEQ from '../../components/MelodicEQ/MelodicEQ';
 import Sidebar from '../SideBar/Sidebar';
 import GlitchRhythm from '../../components/GlitchRhythm/GlitchRhythm';
 import BrutalistBackground from '../../components/BrutalistBackground/BrutalistBackground';
+import ElasticProgression from '../../components/ElasticProgression/ElasticProgression';
 
 function Stage({ token }) {
     const [isMenuOpen, setIsMenuOpen] = useState(false);
@@ -136,8 +137,19 @@ function Stage({ token }) {
                 <BrutalistBackground bpm={bpm} isPlaying={isPlaying} />
             )}
 
+            {activeBackground === 'elastic' && (
+                <ElasticProgression 
+                    albumCoverUrl={albumCover} 
+                    bpm={bpm} 
+                    energy={energy} 
+                    isPlaying={isPlaying} 
+                />
+            )}
+            
+
+
             {activeRhythm > 0 && (
-                <OrbitalRhythm bpm={bpm} steps={activeRhythm} />
+                <OrbitalRhythm bpm={bpm} steps={activeRhythm} isPlaying={isPlaying}/>
             )}
 
             {activeRhythm === 'glitch' && (
