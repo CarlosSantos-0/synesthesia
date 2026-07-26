@@ -1,8 +1,9 @@
-import { useState, useEffect } from 'react';
-import styles from './Stage.module.css';
-import PlaceHolder from '../../assets/PlaceHolder.png';
-import { Menu } from 'lucide-react';
+import { useState, useEffect } from 'react'; 
+import styles from './Stage.module.css'; 
+import PlaceHolder from '../../assets/PlaceHolder.png'; 
+import { Menu } from 'lucide-react'; 
 
+// Imports dos seus componentes[cite: 1]
 import DynamicBackground from '../../components/DynamicBackground/DynamicBackground';
 import KineticParticles from '../../components/KineticParticles/KineticParticles';
 import OrbitalRhythm from '../../components/OrbitalRhythm/OrbitalRhythm';
@@ -13,107 +14,95 @@ import BrutalistBackground from '../../components/BrutalistBackground/BrutalistB
 import ElasticProgression from '../../components/ElasticProgression/ElasticProgression';
 import StarryRhythm from '../../components/StarryRhythm/StarryRhythm';
 import Juggernaut from '../../components/Juggernaut/Juggernaut';
+import Polyphia from '../../components/Polyphia/Polyphia';
 
-function Stage({ token }) {
-    const [isMenuOpen, setIsMenuOpen] = useState(false);
-    const [activeBackground, setActiveBackground] = useState('particles');
-    const [activeRhythm, setActiveRhythm] = useState(8);
-    const [activeMelodic, setActiveMelodic] = useState('eq-bottom');
-    const [activeSoundboard, setActiveSoundboard] = useState('juggernaut');
+// IMPORTANDO O NOVO HOOK
+import { useVirtualInsanity } from '../../hooks/useVirtualInsanity'; 
 
-    // Estados estáticos mantidos para não quebrar a mesa de VJ
+function Stage({ token }) { 
+    const [isMenuOpen, setIsMenuOpen] = useState(false); 
+    const [activeBackground, setActiveBackground] = useState('particles'); 
+    const [activeRhythm, setActiveRhythm] = useState(8); 
+    const [activeMelodic, setActiveMelodic] = useState('eq-bottom'); 
+    const [activeSoundboard, setActiveSoundboard] = useState('juggernaut'); 
+    const [activeSpecial, setActiveSpecial] = useState('none'); 
+
     const [bpm, setBpm] = useState(120); 
     const [energy, setEnergy] = useState(0.5); 
 
-    const [isPlaying, setIsPlaying] = useState(false);
-    const [progress, setProgress] = useState(0);
-    const [duration, setDuration] = useState(180);
-    const [albumCover, setAlbumCover] = useState(PlaceHolder);
-    const [trackName, setTrackName] = useState('');
-    const [artistName, setArtistName] = useState('');
-    const [trackId, setTrackId] = useState(null);
+    const [isPlaying, setIsPlaying] = useState(false); 
+    const [progress, setProgress] = useState(0); 
+    const [duration, setDuration] = useState(180); 
+    const [albumCover, setAlbumCover] = useState(PlaceHolder); 
+    const [trackName, setTrackName] = useState(''); 
+    const [artistName, setArtistName] = useState(''); 
+    const [trackId, setTrackId] = useState(null); 
 
+    // === MÁGICA AQUI: O HOOK CUIDA DE TUDO ===
+    const { isVirtualInsanity, viVars } = useVirtualInsanity(activeSpecial);
+
+    // Efeitos de conexão com a API do Spotify permanecem inalterados[cite: 1]
     useEffect(() => {
-        if (!token) return;
+        if (!token) return; 
 
-        const fetchCurrentlyPlaying = async () => {
-            try {
-                const response = await fetch("https://api.spotify.com/v1/me/player/currently-playing", {
-                    headers: { Authorization: `Bearer ${token}` }
-                });
+        const fetchCurrentlyPlaying = async () => { 
+            try { 
+                const response = await fetch("https://api.spotify.com/v1/me/player/currently-playing", { 
+                    headers: { Authorization: `Bearer ${token}` } 
+                }); 
 
-                if (response.status === 204) {
-                    console.log('Spotify currently-playing returned 204 (no content)');
-                    return;
-                }
-                if (!response.ok) {
-                    const errorText = await response.text();
-                    console.error('Spotify currently-playing error', response.status, errorText);
-                    return;
-                }
+                if (response.status === 204) { 
+                    console.log('Spotify currently-playing returned 204 (no content)'); 
+                    return; 
+                } 
+                if (!response.ok) { 
+                    const errorText = await response.text(); 
+                    console.error('Spotify currently-playing error', response.status, errorText); 
+                    return; 
+                } 
 
-                const data = await response.json();
-                console.log('Spotify currently-playing data', data);
+                const data = await response.json(); 
+                console.log('Spotify currently-playing data', data); 
                 
-                if (data && data.item) {
-                    console.log('Spotify item', {
-                        id: data.item.id,
-                        type: data.item.type,
-                        name: data.item.name,
-                        is_playing: data.is_playing,
-                    });
-                    setAlbumCover(data.item.album.images[0].url);
-                    setIsPlaying(data.is_playing);
-                    setProgress(Math.floor(data.progress_ms / 1000));
-                    setDuration(Math.floor(data.item.duration_ms / 1000));
-                    setTrackName(data.item.name);
-                    setArtistName(data.item.artists.map(artist => artist.name).join(', '));
+                if (data && data.item) { 
+                    setAlbumCover(data.item.album.images[0].url); 
+                    setIsPlaying(data.is_playing); 
+                    setProgress(Math.floor(data.progress_ms / 1000)); 
+                    setDuration(Math.floor(data.item.duration_ms / 1000)); 
+                    setTrackName(data.item.name); 
+                    setArtistName(data.item.artists.map(artist => artist.name).join(', ')); 
                     
-                    if (data.item.type === 'track') {
-                        if (data.item.id !== trackId) {
-                            setTrackId(data.item.id);
-                        }
-                    } else {
-                        setTrackId(null);
-                    }
-                }
-            } catch (error) {
-                console.error("Erro ao buscar música:", error);
-            }
-        };
+                    if (data.item.type === 'track') { 
+                        if (data.item.id !== trackId) { 
+                            setTrackId(data.item.id); 
+                        } 
+                    } else { 
+                        setTrackId(null); 
+                    } 
+                } 
+            } catch (error) { 
+                console.error("Erro ao buscar música:", error); 
+            } 
+        }; 
 
-        fetchCurrentlyPlaying();
-        const interval = setInterval(fetchCurrentlyPlaying, 1000); 
-        return () => clearInterval(interval);
-    }, [token, trackId]);
+        fetchCurrentlyPlaying(); 
+        const interval = setInterval(fetchCurrentlyPlaying, 1000);  
+        return () => clearInterval(interval); 
+    }, [token, trackId]); 
 
-    useEffect(() => {
-        console.log('Stage state', {
-            activeBackground,
-            isPlaying,
-            trackId,
-            trackName,
-            artistName,
-            bpm,
-            energy,
-        });
-    }, [activeBackground, isPlaying, trackId, trackName, artistName, bpm, energy]);
+    useEffect(() => { 
+        let interval; 
+        if (isPlaying) { 
+            interval = setInterval(() => { 
+                setProgress((prev) => (prev >= duration ? 0 : prev + 1)); 
+            }, 1000); 
+        } 
+        return () => clearInterval(interval); 
+    }, [isPlaying, duration]); 
 
-    // O useEffect do fetchAudioData foi completamente removido daqui.
+    const progressPercent = (progress / duration) * 100; 
 
-    useEffect(() => {
-        let interval;
-        if (isPlaying) {
-            interval = setInterval(() => {
-                setProgress((prev) => (prev >= duration ? 0 : prev + 1));
-            }, 1000);
-        }
-        return () => clearInterval(interval);
-    }, [isPlaying, duration]);
-
-    const progressPercent = (progress / duration) * 100;
-
-    return (
+    return ( 
         <div className={styles.stage}>
             
             <Sidebar 
@@ -127,44 +116,32 @@ function Stage({ token }) {
                 setActiveMelodic={setActiveMelodic}
                 activeSoundboard={activeSoundboard}
                 setActiveSoundboard={setActiveSoundboard}
+                activeSpecial={activeSpecial}
+                setActiveSpecial={setActiveSpecial}
             />
 
-            {/* CAMADA 1: BACKGROUNDS */}
+            {/* CAMADA 1: BACKGROUNDS ESTÁTICOS NO SEU LUGAR */}
             {activeBackground === 'dynamic' && (
                 <DynamicBackground albumCoverUrl={albumCover} bpm={bpm} energy={energy} />
             )}
-
             {activeBackground === 'particles' && (
                 <KineticParticles albumCoverUrl={albumCover} bpm={bpm} energy={energy} />
             )}
-
             {activeBackground === 'brutalist' && (
                 <BrutalistBackground bpm={bpm} isPlaying={isPlaying} />
             )}
-
             {activeBackground === 'elastic' && (
-                <ElasticProgression 
-                    albumCoverUrl={albumCover} 
-                    bpm={bpm} 
-                    energy={energy} 
-                    isPlaying={isPlaying} 
-                />
+                <ElasticProgression albumCoverUrl={albumCover} bpm={bpm} energy={energy} isPlaying={isPlaying} />
             )}
-
             {activeBackground === 'starry' && (
                 <StarryRhythm bpm={bpm} energy={energy} isPlaying={isPlaying} albumCoverUrl={albumCover}/>
             )}
-            
-
-
             {activeRhythm > 0 && (
                 <OrbitalRhythm bpm={bpm} steps={activeRhythm} isPlaying={isPlaying}/>
             )}
-
             {activeRhythm === 'glitch' && (
                 <GlitchRhythm bpm={bpm} energy={energy} isPlaying={isPlaying} />
             )}
-
             {activeMelodic === 'eq-bottom' && (
                 <MelodicEQ bpm={bpm} energy={energy} albumCoverUrl={albumCover} />
             )}
@@ -173,8 +150,20 @@ function Stage({ token }) {
             {activeSoundboard === 'juggernaut' && (
                 <Juggernaut albumCoverUrl={albumCover} bpm={bpm}/>
             )}
+
+            {activeSoundboard === 'polyphia' && (
+                <Polyphia albumCoverUrl={albumCover} />
+            )}
             
-            <header className={styles.header}>
+            {/* INTERFACE DESLIZANTE COM INJEÇÃO DE VARIÁVEIS CSS */}
+            <header 
+                className={`${styles.header} ${styles.viElement} ${isVirtualInsanity ? styles.viActive : ''}`}
+                style={{
+                    '--vi-x': `${viVars.header.x}vw`,
+                    '--vi-y': `${viVars.header.y}vh`,
+                    '--vi-scale': viVars.header.s
+                }}
+            >
                 <Menu 
                     className={styles.menuIcon} 
                     size={28} 
@@ -186,11 +175,25 @@ function Stage({ token }) {
                 </div>
             </header>
 
-            <main className={styles.center}>
+            <main 
+                className={`${styles.center} ${styles.viElement} ${isVirtualInsanity ? styles.viActive : ''}`}
+                style={{
+                    '--vi-x': `${viVars.main.x}vw`,
+                    '--vi-y': `${viVars.main.y}vh`,
+                    '--vi-scale': viVars.main.s
+                }}
+            >
                 <img src={albumCover} alt="Capa" className={styles.coverImage} />
             </main>
 
-            <footer className={styles.footer}>
+            <footer 
+                className={`${styles.footer} ${styles.viElement} ${isVirtualInsanity ? styles.viActive : ''}`}
+                style={{
+                    '--vi-x': `${viVars.footer.x}vw`,
+                    '--vi-y': `${viVars.footer.y}vh`,
+                    '--vi-scale': viVars.footer.s
+                }}
+            >
                 <div className={styles.progressBarContainer}>
                     <div className={styles.progressBar}>
                         <div 

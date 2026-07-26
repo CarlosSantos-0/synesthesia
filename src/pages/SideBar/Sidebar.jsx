@@ -13,6 +13,8 @@ export default function Sidebar({
     setActiveMelodic,
     activeSoundboard,
     setActiveSoundboard,
+    activeSpecial, 
+    setActiveSpecial
 }) {
     const [isBgMenuExpanded, setIsBgMenuExpanded] = useState(true);
     const [isRhythmMenuExpanded, setIsRhythmMenuExpanded] = useState(true);
@@ -135,13 +137,38 @@ export default function Sidebar({
                                 <button className={`${styles.optionBtn} ${activeSoundboard === 'juggernaut' ? styles.active : ''}`} onClick={() => setActiveSoundboard('juggernaut')}>
                                     Juggernaut (Dubstep)
                                 </button>
+                                <button className={`${styles.optionBtn} ${activeSoundboard === 'polyphia' ? styles.active : ''}`} onClick={() => setActiveSoundboard('polyphia')}>
+                                    Polyphia
+                                </button>
                                 <button className={`${styles.optionBtn} ${activeSoundboard === 'none' ? styles.active : ''}`} onClick={() => setActiveSoundboard('none')}>
                                     Desligado
                                 </button>
                             </div>
                         )}
                     </div>
-
+                    {/* NOVA SEÇÃO: ESPECIAIS / HERO EFFECTS */}
+                    <div className={styles.section}>
+                        <h3 className={styles.sectionTitle}>Especiais</h3>
+                        <div className={styles.buttonGroup}>
+                            <button 
+                                className={`${styles.optionBtn} ${activeSpecial === 'none' ? styles.active : ''}`}
+                                onClick={() => setActiveSpecial('none')}
+                            >
+                                Nenhum
+                            </button>
+                            <button 
+                                className={`${styles.optionBtn} ${activeSpecial === 'virtual-insanity' ? styles.active : ''}`}
+                                onClick={() => setActiveSpecial('virtual-insanity')}
+                            >
+                                Virtual Insanity
+                            </button>
+                        </div>
+                        <p className={styles.helperText}>
+                            {activeSpecial === 'virtual-insanity' 
+                                ? "Segure a tecla 'V' para desmontar o palco." 
+                                : "Selecione um efeito Hero."}
+                        </p>
+                    </div>
                 </div>
             </div>
         </>

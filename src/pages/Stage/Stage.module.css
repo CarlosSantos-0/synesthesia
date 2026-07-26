@@ -105,3 +105,18 @@
     border-radius: 50%;
     transition: left 1s linear;
 }
+
+/* =========================================
+   EFEITO ESPECIAL: VIRTUAL INSANITY (DINÂMICO)
+========================================= */
+
+/* Posição de repouso (desligado) e transição linear lenta */
+.viElement {
+    transition: transform 10s linear !important;
+    transform: translate(0, 0) scale(1); /* Garante que voltem ao normal ao soltar a tecla */
+}
+
+/* Quando ativado, consome as variáveis dinâmicas injetadas pelo React */
+.viActive {
+    transform: translate(var(--vi-x, 0vw), var(--vi-y, 0vh)) scale(var(--vi-scale, 1)) !important;
+}

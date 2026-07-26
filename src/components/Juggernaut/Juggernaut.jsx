@@ -108,7 +108,7 @@ export default function Juggernaut({ albumCoverUrl, bpm = 150 }) {
             const cx = canvas.width / 2;
             const cy = canvas.height / 2;
             
-            if (key === 'w') fireLasers({ x: cx, y: 0 }, Math.PI / 2);
+            if (key === 'f') fireLasers({ x: cx, y: 0 }, Math.PI / 2);
             else if (key === 's') fireLasers({ x: cx, y: canvas.height }, -Math.PI / 2);
             else if (key === 'a') fireLasers({ x: 0, y: cy }, 0);
             else if (key === 'd') fireLasers({ x: canvas.width, y: cy }, Math.PI);
