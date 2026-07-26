@@ -1,0 +1,9 @@
+.canvasOverlay {
+    position: fixed; /* Fixed garante que cubra a tela toda mesmo com scroll */
+    top: 0;
+    left: 0;
+    width: 100vw;
+    height: 100vh;
+    z-index: -1; /* Fica acima do palco e do player */
+    pointer-events: none; /* Deixa os cliques passarem para os botões do app */
+}

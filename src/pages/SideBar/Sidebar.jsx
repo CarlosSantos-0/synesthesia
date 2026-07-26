@@ -1,5 +1,5 @@
 import { useState } from 'react';
-import { X, ChevronDown, ChevronRight, Layers, Activity, Radio } from 'lucide-react';
+import { X, ChevronDown, ChevronRight, Layers, Activity, Radio, Keyboard } from 'lucide-react';
 import styles from './Sidebar.module.css';
 
 export default function Sidebar({ 
@@ -10,11 +10,14 @@ export default function Sidebar({
     activeRhythm, 
     setActiveRhythm,
     activeMelodic,       
-    setActiveMelodic
+    setActiveMelodic,
+    activeSoundboard,
+    setActiveSoundboard,
 }) {
     const [isBgMenuExpanded, setIsBgMenuExpanded] = useState(true);
     const [isRhythmMenuExpanded, setIsRhythmMenuExpanded] = useState(true);
     const [isMelodicMenuExpanded, setIsMelodicMenuExpanded] = useState(true);
+    const [isSoundboardMenuExpanded, setIsSoundboardMenuExpanded] = useState(true);
 
     return (
         <>
@@ -51,6 +54,9 @@ export default function Sidebar({
                                 </button>
                                 <button className={`${styles.optionBtn} ${activeBg === 'elastic' ? styles.active : ''}`} onClick={() => { console.log('Sidebar selected background', 'elastic'); setActiveBg('elastic'); }}>
                                     Slam jam
+                                </button>
+                                <button className={`${styles.optionBtn} ${activeBg === 'starry' ? styles.active : ''}`} onClick={() => { console.log('Sidebar selected background', 'starry'); setActiveBg('starry'); }}>
+                                    Céu Estrelado
                                 </button>
                                 <button className={`${styles.optionBtn} ${activeBg === 'none' ? styles.active : ''}`} onClick={() => { console.log('Sidebar selected background', 'none'); setActiveBg('none'); }}>
                                     Fundo Escuro
@@ -106,6 +112,30 @@ export default function Sidebar({
                                     EQ Espelhado (Base)
                                 </button>
                                 <button className={`${styles.optionBtn} ${activeMelodic === 'none' ? styles.active : ''}`} onClick={() => setActiveMelodic('none')}>
+                                    Desligado
+                                </button>
+                            </div>
+                        )}
+
+                        
+                    </div>
+                    
+                    {/* GRUPO 4: SOUNDBOARDS */}
+                    <div className={styles.menuGroup}>
+                        <div className={styles.groupHeader} onClick={() => setIsSoundboardMenuExpanded(!isSoundboardMenuExpanded)}>
+                            <div className={styles.groupTitle}>
+                                <Keyboard size={20} strokeWidth={1.5} />
+                                <span>Soundboards</span>
+                            </div>
+                            {isSoundboardMenuExpanded ? <ChevronDown size={20} strokeWidth={1.5} /> : <ChevronRight size={20} strokeWidth={1.5} />}
+                        </div>
+
+                        {isSoundboardMenuExpanded && (
+                            <div className={styles.groupOptions}>
+                                <button className={`${styles.optionBtn} ${activeSoundboard === 'juggernaut' ? styles.active : ''}`} onClick={() => setActiveSoundboard('juggernaut')}>
+                                    Juggernaut (Dubstep)
+                                </button>
+                                <button className={`${styles.optionBtn} ${activeSoundboard === 'none' ? styles.active : ''}`} onClick={() => setActiveSoundboard('none')}>
                                     Desligado
                                 </button>
                             </div>

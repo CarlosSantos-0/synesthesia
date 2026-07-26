@@ -11,12 +11,15 @@ import Sidebar from '../SideBar/Sidebar';
 import GlitchRhythm from '../../components/GlitchRhythm/GlitchRhythm';
 import BrutalistBackground from '../../components/BrutalistBackground/BrutalistBackground';
 import ElasticProgression from '../../components/ElasticProgression/ElasticProgression';
+import StarryRhythm from '../../components/StarryRhythm/StarryRhythm';
+import Juggernaut from '../../components/Juggernaut/Juggernaut';
 
 function Stage({ token }) {
     const [isMenuOpen, setIsMenuOpen] = useState(false);
     const [activeBackground, setActiveBackground] = useState('particles');
     const [activeRhythm, setActiveRhythm] = useState(8);
     const [activeMelodic, setActiveMelodic] = useState('eq-bottom');
+    const [activeSoundboard, setActiveSoundboard] = useState('juggernaut');
 
     // Estados estáticos mantidos para não quebrar a mesa de VJ
     const [bpm, setBpm] = useState(120); 
@@ -122,6 +125,8 @@ function Stage({ token }) {
                 setActiveRhythm={setActiveRhythm}
                 activeMelodic={activeMelodic}         
                 setActiveMelodic={setActiveMelodic}
+                activeSoundboard={activeSoundboard}
+                setActiveSoundboard={setActiveSoundboard}
             />
 
             {/* CAMADA 1: BACKGROUNDS */}
@@ -145,6 +150,10 @@ function Stage({ token }) {
                     isPlaying={isPlaying} 
                 />
             )}
+
+            {activeBackground === 'starry' && (
+                <StarryRhythm bpm={bpm} energy={energy} isPlaying={isPlaying} albumCoverUrl={albumCover}/>
+            )}
             
 
 
@@ -158,6 +167,11 @@ function Stage({ token }) {
 
             {activeMelodic === 'eq-bottom' && (
                 <MelodicEQ bpm={bpm} energy={energy} albumCoverUrl={albumCover} />
+            )}
+
+            {/* CAMADA 4: SOUNDBOARDS INTERATIVOS */}
+            {activeSoundboard === 'juggernaut' && (
+                <Juggernaut albumCoverUrl={albumCover} bpm={bpm}/>
             )}
             
             <header className={styles.header}>

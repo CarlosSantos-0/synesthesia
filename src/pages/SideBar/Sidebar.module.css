@@ -32,6 +32,7 @@
     display: flex;
     flex-direction: column;
     color: white;
+    overflow: hidden;
 }
 
 .open {
@@ -65,10 +66,29 @@
 }
 
 .content {
-    padding: 24px 32px;
+    padding: 24px 32px 32px;
     display: flex;
     flex-direction: column;
     gap: 24px;
+    overflow-y: auto;
+    overflow-x: hidden;
+    flex: 1;
+    min-height: 0;
+    scrollbar-width: thin;
+    scrollbar-color: rgba(255, 255, 255, 0.25) transparent;
+}
+
+.content::-webkit-scrollbar {
+    width: 6px;
+}
+
+.content::-webkit-scrollbar-thumb {
+    background-color: rgba(255, 255, 255, 0.25);
+    border-radius: 999px;
+}
+
+.content::-webkit-scrollbar-track {
+    background: transparent;
 }
 
 .groupHeader {
